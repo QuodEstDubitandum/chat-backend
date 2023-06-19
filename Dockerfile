@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . ./
 
-COPY .env ./
+# COPY .env ./
 
 RUN go build -o chat-backend
 
