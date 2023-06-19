@@ -17,7 +17,6 @@ import (
 	"sync"
 
 	"cloud.google.com/go/firestore"
-	"github.com/joho/godotenv"
 	"golang.org/x/net/websocket"
 )
 
@@ -137,10 +136,10 @@ func WithMiddleware(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func main(){
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 
 	ctx := context.Background()
 	firestore := database.SetupDatabase(ctx)
@@ -154,7 +153,7 @@ func main(){
 	http.Handle("/chat", websocket.Handler(server.handleNewConnection))
 
 	fmt.Println("Server listening on port 8080")
-	err = http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil{
 		log.Fatal("Server connection error: ", err)
 	}
