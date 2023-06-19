@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"net/url"
 	"realtime-chat/api"
 	"realtime-chat/database"
 	"realtime-chat/models"
@@ -77,6 +78,14 @@ func (s* Server) handleNewConnection(ws *websocket.Conn){
 	apiKey := headers[0]
 	user := headers[1]
 
+	decodedUsername, err := url.PathUnescape(user)
+	if err != nil {
+		errMsg := []byte("Username decoding error")
+		ws.Write(errMsg)
+		ws.Close()
+		return
+	}
+
 	if apiKey != os.Getenv("API_KEY") {
 		errMsg := []byte("Invalid API key")
 		ws.Write(errMsg)
@@ -84,7 +93,7 @@ func (s* Server) handleNewConnection(ws *websocket.Conn){
 		return
 	}
 
-	if user == ""{
+	if decodedUsername == ""{
 		errMsg := []byte("Invalid Username")
 		ws.Write(errMsg)
 		ws.Close()
@@ -94,7 +103,7 @@ func (s* Server) handleNewConnection(ws *websocket.Conn){
 	messageChan := make(chan string) 
 
 	s.mutex.Lock()
-	s.connections[ws] = user
+	s.connections[ws] = decodedUsername
 	s.mutex.Unlock()
 	
 	go s.BroadcastMessages(ws, messageChan)
